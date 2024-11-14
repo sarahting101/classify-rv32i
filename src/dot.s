@@ -33,15 +33,22 @@ dot:
 
     li t0, 0            
     li t1, 0         
+	
+	li t6, 4
+	mul t5, a3, t6	#t5=a1 stride
+	mul t6, a4, t6	#t6=a2 stride
 
 loop_start:
     # TODO: Add your own implementation
-    lw t2, 0(a0)
-    lw t3, 0(a1)
-    
-    addi t1, t1, -1
+    lw t2, 0(a0)	#t2=a0[]
+    lw t3, 0(a1)	#t3=a1[]
+    mul t4, t2, t3
+	add t0, t0, t4
+    addi a2, a2, -1
     bge t1, a2, loop_end
-    
+	
+	add a0, a0, t5
+	add a1, a1, t6
     j loop_start
 
 
