@@ -62,7 +62,7 @@ matmul:
 outer_loop_start:
     #s0 is going to be the loop counter for the rows in A
     li s1, 0
-    mv s4, a3
+    mv s4, a3	#s4 point to the first element of M1
     blt s0, a1, inner_loop_start
 
     j outer_loop_end
@@ -116,7 +116,35 @@ inner_loop_start:
     
 inner_loop_end:
     # TODO: Add your own implementation
+	
+	
+	addi s0, s0, 1	# M0 row counter+=1
+	
+	# move s3 to next head of row
+	li t3, 4	
+	mul t2, a2, t3
+	add s3, s3, t2
+	
+	
+	
+	j outer_loop_start	
+	
+outer_loop_end:
+	sw ra, 0(sp)
+	lw s0, 4(sp)
+    lw s1, 8(sp)
+    lw s2, 12(sp)
+    lw s3, 16(sp)
+    lw s4, 20(sp)
+    lw s5, 24(sp)
+	addi sp, sp, 28
+	ret
 
 error:
     li a0, 38
     j exit
+
+exit:
+	mv a1, a0
+	li a0, 17
+	ecall
