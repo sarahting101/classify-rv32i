@@ -35,11 +35,18 @@ dot:
     li t1, 0         
 
 loop_start:
-    bge t1, a2, loop_end
     # TODO: Add your own implementation
+    lw t2, 0(a0)
+    lw t3, 0(a1)
+    
+    addi t1, t1, -1
+    bge t1, a2, loop_end
+    
+    j loop_start
+
 
 loop_end:
-    mv a0, t0
+    mv a0, t0   #t0=result
     jr ra
 
 error_terminate:
@@ -50,3 +57,7 @@ error_terminate:
 set_error_36:
     li a0, 36
     j exit
+    
+exit:
+    li a7, 10
+    ecall
