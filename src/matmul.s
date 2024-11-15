@@ -121,12 +121,11 @@ inner_loop_end:
 	addi s0, s0, 1	# M0 row counter+=1
 	
 	# move s3 to next head of row
-	li t3, 4	
-	mul t2, a2, t3
+	li t3, 2
+	#mul t2, a2, t3
+	sll t2, a2, t3
+	
 	add s3, s3, t2
-	
-	
-	
 	j outer_loop_start	
 	
 outer_loop_end:
@@ -139,7 +138,7 @@ outer_loop_end:
     lw s5, 24(sp)
 	addi sp, sp, 28
 	jr ra
-
+	
 error:
     li a0, 38
     j exit
