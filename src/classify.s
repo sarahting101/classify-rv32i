@@ -27,6 +27,45 @@
 # Usage Example:
 #   main.s <M0_PATH> <M1_PATH> <INPUT_PATH> <OUTPUT_PATH>
 # =====================================
+mul_rv32i:
+	beq a0, x0, mul_end
+	beq a1, x0, mul_end
+	li t2, 0		#result
+	xor t3, a0, a1	#signed
+	bge a0, x0, positive_a0
+	sub t0, x0, a0	#make a0 positive
+	j check_a1
+	
+positive_a0:
+	mv t0, a0
+	
+check_a1:
+	bge a1, x0, positive_a1
+	sub t1, x0, a1	#make a1 positive
+	j mul_loop
+	
+positive_a1:
+	mv t1, a1
+	
+mul_loop:
+	beq t1, x0, mul_end
+	andi t5, t1, 1
+	beq t5, x0, skip_add
+	add t2, t2, t0
+	
+skip_add:
+	slli t0, t0, 1
+	srli t1, t1, 1
+	j mul_loop
+	
+mul_end:
+	bge t3, x0, mul_fin
+	sub t2, x0, t2
+
+mul_fin:
+	mv a0, t2
+	ret
+
 classify:
     # Error handling
     li t0, 5
@@ -166,7 +205,43 @@ classify:
     
     lw t0, 0(s3)
     lw t1, 0(s8)
-    # mul a0, t0, t1 # FIXME: Replace 'mul' with your own implementation
+    # mul a0, t0, t1 # FIXME1: Replace 'mul' with your own implementation
+		
+	addi sp, sp, -16
+	sw a0, 0(sp)
+	sw a1, 4(sp)
+	sw t0, 8(sp)
+	sw t1, 12(sp)
+	#sw t2, 16(sp)
+	#sw t3, 20(sp)
+	#sw t5, 24(sp)
+	
+	add a0, x0, t0
+	add a1, x0, t1
+	
+	addi sp, sp, -4
+	sw ra, 0(sp)
+	jal mul_rv32i
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	
+#mul_a0:
+	mv t6, a0
+
+	lw a0, 0(sp)
+	lw a1, 4(sp)
+	lw t0, 8(sp)
+	lw t1, 12(sp)
+	#lw t2, 16(sp)
+	#lw t3, 20(sp)
+	#lw t5, 24(sp)
+	addi sp, sp, 16
+	
+	mv a0, t6
+	
+	# mul_end
+
+	
     slli a0, a0, 2
     jal malloc 
     beq a0, x0, error_malloc
@@ -204,8 +279,43 @@ classify:
     lw t0, 0(s3)
     lw t1, 0(s8)
     # mul a1, t0, t1 # length of h array and set it as second argument
-    # FIXME: Replace 'mul' with your own implementation
+    # FIXME2: Replace 'mul' with your own implementation
     
+	addi sp, sp, -16
+	sw a0, 0(sp)
+	sw a1, 4(sp)
+	sw t0, 8(sp)
+	sw t1, 12(sp)
+	#sw t2, 16(sp)
+	#sw t3, 20(sp)
+	#sw t5, 24(sp)
+	
+	add a0, x0, t0
+	add a1, x0, t1
+	
+	
+	addi sp, sp, -4
+	sw ra, 0(sp)
+	jal mul_rv32i
+	lw ra, 0(sp)
+	addi sp, sp, 4
+
+#mul_a1:
+	mv t6, a0
+
+	lw a0, 0(sp)
+	lw a1, 4(sp)
+	lw t0, 8(sp)
+	lw t1, 12(sp)
+	#lw t2, 16(sp)
+	#lw t3, 20(sp)
+	#lw t5, 24(sp)
+	addi sp, sp, 16
+	
+	mv a1, t6
+	
+	# mul_end
+	
     jal relu
     
     lw a0, 0(sp)
@@ -226,7 +336,46 @@ classify:
     
     lw t0, 0(s3)
     lw t1, 0(s6)
-    # mul a0, t0, t1 # FIXME: Replace 'mul' with your own implementation
+    # mul a0, t0, t1 # FIXME3: Replace 'mul' with your own implementation
+	
+	addi sp, sp, -16
+	sw a0, 0(sp)
+	sw a1, 4(sp)
+	sw t0, 8(sp)
+	sw t1, 12(sp)
+	#sw t2, 16(sp)
+	#sw t3, 20(sp)
+	#sw t5, 24(sp)
+	
+	add a0, x0, t0
+	add a1, x0, t1
+	
+	
+	addi sp, sp, -4
+	sw ra, 0(sp)
+	jal mul_rv32i
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	
+#mul_t4:
+	mv t6, a0
+
+	lw a0, 0(sp)
+	lw a1, 4(sp)
+	lw t0, 8(sp)
+	lw t1, 12(sp)
+	#lw t2, 16(sp)
+	#lw t3, 20(sp)
+	#lw t5, 24(sp)
+	addi sp, sp, 16
+	
+	mv a0, t6
+	
+	# mul_end
+
+	
+	
+	
     slli a0, a0, 2
     jal malloc 
     beq a0, x0, error_malloc
@@ -286,9 +435,45 @@ classify:
     mv a0, s10 # load o array into first arg
     lw t0, 0(s3)
     lw t1, 0(s6)
-    mul a1, t0, t1 # load length of array into second arg
-    # FIXME: Replace 'mul' with your own implementation
+    # mul a1, t0, t1 # load length of array into second arg
+    # FIXME4: Replace 'mul' with your own implementation
     
+	addi sp, sp, -16
+	sw a0, 0(sp)
+	sw a1, 4(sp)
+	sw t0, 8(sp)
+	sw t1, 12(sp)
+	#sw t2, 16(sp)
+	#sw t3, 20(sp)
+	#sw t5, 24(sp)
+	
+	add a0, x0, t0
+	add a1, x0, t1
+	
+	
+	addi sp, sp, -4
+	sw ra, 0(sp)
+	jal mul_rv32i
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	
+#mul_a1:
+	mv t6, a0
+
+	lw a0, 0(sp)
+	lw a1, 4(sp)
+	lw t0, 8(sp)
+	lw t1, 12(sp)
+	#lw t2, 16(sp)
+	#lw t3, 20(sp)
+	#lw t5, 24(sp)
+	addi sp, sp, 16
+	
+	mv a1, t6
+	
+	# mul_end
+	
+	
     jal argmax
     
     mv t0, a0 # move return value of argmax into t0
@@ -384,3 +569,6 @@ error_args:
 error_malloc:
     li a0, 26
     j exit
+	
+
+	

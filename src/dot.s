@@ -145,5 +145,7 @@ set_error_36:
     j exit
     
 exit:
-    li a7, 10
+	mv a1, a0
+    li a0, 17
+	#li a7, 10
     ecall
