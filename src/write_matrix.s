@@ -184,3 +184,8 @@ error_exit:
     lw s4, 20(sp)
     addi sp, sp, 44
     j exit
+	
+exit:
+	mv a1, a0
+	li a0, 17
+	ecall

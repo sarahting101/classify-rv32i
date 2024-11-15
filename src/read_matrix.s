@@ -212,4 +212,9 @@ error_exit:
     addi sp, sp, 40
     j exit
 	
+exit:
+	mv a1, a0
+	li a0, 17
+	ecall
+	
 	
