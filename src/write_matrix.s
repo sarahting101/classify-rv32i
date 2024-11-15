@@ -63,6 +63,77 @@ write_matrix:
 
     # mul s4, s2, s3   # s4 = total elements
     # FIXME: Replace 'mul' with your own implementation
+	
+	
+	addi sp, sp, -12
+	sw a0, 0(sp)
+	sw a1, 4(sp)
+	sw t0, 8(sp)
+	#sw t1, 12(sp)
+	#sw t2, 16(sp)
+	#sw t3, 20(sp)
+	#sw t5, 24(sp)
+	
+	add a0, x0, s2
+	add a1, x0, s3
+	
+	
+	j mul_rv32i
+	
+mul_rv32i:
+	beq a0, x0, mul_end
+	beq a1, x0, mul_end
+	li t2, 0		#result
+	xor t3, a0, a1	#signed
+	bge a0, x0, positive_a0
+	sub t0, x0, a0	#make a0 positive
+	j check_a1
+	
+positive_a0:
+	mv t0, a0
+	
+check_a1:
+	bge a1, x0, positive_a1
+	sub t1, x0, a1	#make a1 positive
+	j mul_loop
+	
+positive_a1:
+	mv t1, a1
+	
+mul_loop:
+	beq t1, x0, mul_end
+	andi t5, t1, 1
+	beq t5, x0, skip_add
+	add t2, t2, t0
+	
+skip_add:
+	slli t0, t0, 1
+	srli t1, t1, 1
+	j mul_loop
+	
+mul_end:
+	bge t3, x0, mul_fin
+	sub t2, x0, t2
+
+mul_fin:
+	j mul_s4
+	
+	
+
+mul_s4:
+	mv s4, t2
+
+	lw a0, 0(sp)
+	lw a1, 4(sp)
+	lw t0, 8(sp)
+	#lw t1, 12(sp)
+	#lw t2, 16(sp)
+	#lw t3, 20(sp)
+	#lw t5, 24(sp)
+	addi sp, sp, 12
+	
+	# mul_end
+
 
     # write matrix data to file
     mv a0, s0
