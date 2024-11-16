@@ -48,14 +48,9 @@ positive_a1:
 	mv t1, a1
 	
 mul_loop:
-	beq t1, x0, mul_end
-	andi t5, t1, 1
-	beq t5, x0, skip_add
 	add t2, t2, t0
-	
-skip_add:
-	slli t0, t0, 1
-	srli t1, t1, 1
+	addi t1, t1, -1
+    beq t1, x0, mul_end
 	j mul_loop
 	
 mul_end:

@@ -25,6 +25,41 @@
 #   - Exits with code 36 if element count < 1
 #   - Exits with code 37 if any stride < 1
 # =======================================================
+
+mul_rv32i:
+	beq a0, x0, mul_end
+	beq a1, x0, mul_end
+	li t2, 0		#result
+	xor t3, a0, a1	#signed
+	bge a0, x0, positive_a0
+	sub t0, x0, a0	#make a0 positive
+	j check_a1
+	
+positive_a0:
+	mv t0, a0
+	
+check_a1:
+	bge a1, x0, positive_a1
+	sub t1, x0, a1	#make a1 positive
+	j mul_loop
+	
+positive_a1:
+	mv t1, a1
+	
+mul_loop:
+	add t2, t2, t0
+	addi t1, t1, -1
+    beq t1, x0, mul_end
+	j mul_loop
+	
+mul_end:
+	bge t3, x0, mul_fin
+	sub t2, x0, t2
+
+mul_fin:
+	mv a0, t2
+	j  mul_t4
+
 dot:
     li t0, 1
     blt a2, t0, error_terminate  
@@ -40,6 +75,9 @@ dot:
 
 	# mul t6, a4, t6	#t6=a2 stride
 	sll t6, a4, t6
+	
+	# addi sp, sp, -4
+	# sw ra, 0(sp)
 	
 
 loop_start:
@@ -62,10 +100,13 @@ loop_start:
 	
 	
 	j mul_rv32i
+
+	# jal mul_rv32i
+	
 	
 	
 mul_t4:
-	mv t4, t2
+	mv t4, a0
 
 	lw a0, 0(sp)
 	lw a1, 4(sp)
@@ -79,60 +120,18 @@ mul_t4:
 	# mul_end
 	add t0, t0, t4
     addi a2, a2, -1
-    bge t1, a2, loop_end
+    beq x0, a2, loop_end
 	
 	add a0, a0, t5
 	add a1, a1, t6
     j loop_start
 	
-mul_rv32i:
-	beq a0, x0, mul_end
-	beq a1, x0, mul_end
-	li t2, 0		#result
-	xor t3, a0, a1	#signed
-	bge a0, x0, positive_a0
-	sub t0, x0, a0	#make a0 positive
-	j check_a1
-	
-positive_a0:
-	mv t0, a0
-	
-check_a1:
-	bge a1, x0, positive_a1
-	sub t1, x0, a1	#make a1 positive
-	j mul_loop
-	
-positive_a1:
-	mv t1, a1
-	
-mul_loop:
-	beq t1, x0, mul_end
-	andi t5, t1, 1
-	beq t5, x0, skip_add
-	add t2, t2, t0
-	
-skip_add:
-	slli t0, t0, 1
-	srli t1, t1, 1
-	j mul_loop
-	
-mul_end:
-	bge t3, x0, mul_fin
-	sub t2, x0, t2
-
-mul_fin:
-	j mul_t4
-	
-	
-	
-	
-	
 
 	
-
-
 loop_end:
     mv a0, t0   #t0=result
+	# lw ra, 0(sp)
+	# addi sp, sp, 4
     jr ra
 
 error_terminate:
