@@ -93,9 +93,9 @@ read_matrix:
 	j mul_rv32i
 	
 mul_rv32i:
-	beq a0, x0, mul_end
-	beq a1, x0, mul_end
 	li t2, 0		#result
+	beq a0, x0, mul_fin
+	beq a1, x0, mul_fin
 	xor t3, a0, a1	#signed
 	bge a0, x0, positive_a0
 	sub t0, x0, a0	#make a0 positive

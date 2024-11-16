@@ -28,9 +28,9 @@
 #   main.s <M0_PATH> <M1_PATH> <INPUT_PATH> <OUTPUT_PATH>
 # =====================================
 mul_rv32i:
-	beq a0, x0, mul_end
-	beq a1, x0, mul_end
 	li t2, 0		#result
+	beq a0, x0, mul_fin
+	beq a1, x0, mul_fin
 	xor t3, a0, a1	#signed
 	bge a0, x0, positive_a0
 	sub t0, x0, a0	#make a0 positive
@@ -48,9 +48,14 @@ positive_a1:
 	mv t1, a1
 	
 mul_loop:
+	beq t1, x0, mul_end
+	andi t5, t1, 1
+	beq t5, x0, skip_add
 	add t2, t2, t0
-	addi t1, t1, -1
-    beq t1, x0, mul_end
+	
+skip_add:
+	slli t0, t0, 1
+	srli t1, t1, 1
 	j mul_loop
 	
 mul_end:
